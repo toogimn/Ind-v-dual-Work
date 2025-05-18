@@ -4,7 +4,7 @@ import time
 
 gradebook = []
 
-# 1. Welcome screen with ASCII Art
+
 def welcome_screen():
     ascii_art = r"""
    ____                 _       _                 __  __                                    
@@ -17,7 +17,7 @@ def welcome_screen():
     print(ascii_art)
     time.sleep(2)
 
-# 2. Main Menu
+
 def main_menu():
     print("""
 ========= Grade Book Menu =========
@@ -36,7 +36,7 @@ def main_menu():
 ===================================
 """)
 
-# 3. Add new student record
+
 def add_record():
     name = input("Enter student name: ")
     grades = []
@@ -52,7 +52,7 @@ def add_record():
     gradebook.append(record)
     print("Record added.\n")
 
-# 4 & 5. View records with formatting
+
 def view_records():
     if not gradebook:
         print("No records available.\n")
@@ -61,7 +61,7 @@ def view_records():
         print(f"{i}. {student['name']} - Grades: {student['grades']}")
     print()
 
-# 6. Search record by name
+
 def search_record():
     name = input("Enter name to search: ")
     found = False
@@ -72,7 +72,7 @@ def search_record():
     if not found:
         print("Student not found.\n")
 
-# 7. Update student record
+
 def update_record():
     name = input("Enter student name to update: ")
     for student in gradebook:
@@ -92,7 +92,7 @@ def update_record():
             return
     print("Student not found.\n")
 
-# 8. Delete record
+
 def delete_record():
     name = input("Enter student name to delete: ")
     for i, student in enumerate(gradebook):
@@ -102,7 +102,7 @@ def delete_record():
             return
     print("Student not found.\n")
 
-# 10. Summary statistics
+
 def summary_stats():
     if not gradebook:
         print("No records to calculate.\n")
@@ -115,13 +115,13 @@ def summary_stats():
             print(f"{student['name']} has no grades.")
     print()
 
-# 11. Save to file
+
 def save_to_file():
     with open("gradebook.json", "w") as f:
         json.dump(gradebook, f)
     print("Data saved to gradebook.json\n")
 
-# 12. Load from file
+
 def load_from_file():
     global gradebook
     try:
@@ -131,13 +131,13 @@ def load_from_file():
     except (FileNotFoundError, json.JSONDecodeError):
         print("Error loading file.\n")
 
-# 17. Recursive count
+
 def recursive_count(index=0):
     if index >= len(gradebook):
         return 0
     return 1 + recursive_count(index + 1)
 
-# 18. Help / Instructions
+
 def help_menu():
     print("""
 Instructions:
@@ -147,7 +147,7 @@ Instructions:
 - Use 'Summary Statistics' for average grades
 """)
 
-# 19. Clear all data
+
 def clear_all_data():
     confirm = input("Are you sure to clear all data? (yes/no): ")
     if confirm.lower() == "yes":
@@ -156,7 +156,7 @@ def clear_all_data():
     else:
         print("Cancelled.\n")
 
-# 14, 15, 9, 13 – Main loop and error handling
+
 def main():
     welcome_screen()
     while True:
