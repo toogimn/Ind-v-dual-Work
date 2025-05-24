@@ -1,28 +1,35 @@
 import json
 
 gradebook = []
-language = "EN"  # Default language
+language = "EN"  # default
 
 
 def _(az, en):
     return az if language == "AZ" else en
 
 
-def authenticate():
-    password = input("🔐 Enter password / Parolu daxil et: ")
-    if password != "1234":
-        print("❌ Wrong password! / Parol yanlışdır!")
-        exit()
-
-
 def choose_language():
     global language
-    lang = input("🌐 Choose language (AZ / EN): ").strip().upper()
+    print("🌐 AZ / EN")
+    lang = input("Dil seçin / Choose language: ").strip().upper()
     if lang in ["AZ", "EN"]:
         language = lang
     else:
-        print("❗ Invalid choice. Defaulting to English.")
+        print("Yanlış seçim. Default olaraq English seçildi.")
         language = "EN"
+
+
+def verify_human():
+    correct = "2"
+    print(_("Zəhmət olmasa insan olduğunuzu təsdiq edin:", "Please verify you're not a robot:"))
+    print(_("Aşağıdakılardan iti seçin:", "Select the dog from the options below:"))
+    options = ["1. 🐱", "2. 🐶", "3. 🐸", "4. 🐵"]
+    for option in options:
+        print(option)
+    choice = input("> ")
+    if choice != correct:
+        print(_("Yanlış seçim. Proqram dayandırılır.", "Wrong choice. Exiting program."))
+        exit()
 
 
 def load_from_file():
@@ -30,124 +37,121 @@ def load_from_file():
     try:
         with open("gradebook.json", "r") as f:
             gradebook = json.load(f)
-        print(_("✅ Məlumatlar yükləndi.", "✅ Data loaded."))
+        print(_("Məlumat yükləndi.", "Data loaded."))
     except:
         gradebook = []
-        print(_("⚠ Fayl tapılmadı, yeni başlanır.", "⚠ File not found, starting fresh."))
+        print(_("Fayl tapılmadı, boş başlanır.", "File not found, starting fresh."))
 
 def save_to_file():
     with open("gradebook.json", "w") as f:
         json.dump(gradebook, f)
-    print(_("💾 Fayla yazıldı.\n", "💾 Saved to file.\n"))
 
 
 def main_menu():
-    print(_("""\
-========= Qiymət Kitabçası Menyusu =========
-1. Yeni Tələbə Əlavə Et
-2. Bütün Qeydləri Göstər
+    print(_("""
+=== Menyu ===
+1. Tələbə əlavə et
+2. Bütün qeydlərə bax
 3. Axtarış
 4. Yenilə
 5. Sil
 6. Statistikalar
-7. Fayla Yaz
-8. Fayldan Oxu
-9. Rekursiv Say
+7. Fayla yaz
+8. Fayldan oxu
+9. Qeyd sayı
 10. Təlimat
-11. Bütün Məlumatı Sil
+11. Bütün məlumatı sil
 0. Çıxış
-============================================""", """\
-========= Grade Book Menu =========
-1. Add New Record
-2. View All Records
-3. Search Record
-4. Update Record
-5. Delete Record
-6. Summary Statistics
+""", """
+=== Menu ===
+1. Add Student
+2. View All
+3. Search
+4. Update
+5. Delete
+6. Statistics
 7. Save to File
 8. Load from File
-9. Recursive Count
-10. Help / Instructions
-11. Clear All Data
+9. Count Records
+10. Help
+11. Clear All
 0. Exit
-==================================="""))
+"""))
+
 
 def add_record():
-    name = input(_("Tələbə adı daxil edin: ", "Enter student name: "))
+    name = input(_("Tələbə adı: ", "Student name: "))
     grades = []
     while True:
-        grade = input(_("Qiymət daxil et (çıxmaq üçün q): ", "Enter grade (or 'q' to quit): "))
+        grade = input(_("Qiymət (bitirmək üçün q): ", "Grade (or 'q' to quit): "))
         if grade.lower() == 'q':
             break
         try:
             grades.append(float(grade))
-        except ValueError:
-            print(_("Yanlış qiymət!", "Invalid grade!"))
+        except:
+            print(_("Yanlış format!", "Invalid format!"))
     gradebook.append({"name": name, "grades": grades})
     save_to_file()
-    print(_("✅ Qeyd əlavə olundu.\n", "✅ Record added.\n"))
+    print(_("Qeyd əlavə olundu.", "Record added."))
 
 def view_records():
     if not gradebook:
-        print(_("🚫 Heç bir qeyd yoxdur.\n", "🚫 No records available.\n"))
+        print(_("Qeyd yoxdur.", "No records available."))
         return
     for i, student in enumerate(gradebook, 1):
-        grades = student['grades']
-        avg = sum(grades)/len(grades) if grades else 0
-        print(f"{i}. {student['name']} - {grades} | {_('Orta:', 'Average:')} {avg:.2f}")
-    print()
+        print(f"{i}. {student['name']} - {student['grades']}")
 
 def search_record():
-    name = input(_("Axtarılacaq ad: ", "Enter name to search: "))
+    name = input(_("Axtarılan ad: ", "Enter name to search: "))
     found = False
     for student in gradebook:
         if name.lower() in student['name'].lower():
-            print(f"🔍 {student['name']} - {student['grades']}")
+            print(f"{student['name']} - {student['grades']}")
             found = True
     if not found:
-        print(_("❌ Tələbə tapılmadı.\n", "❌ Student not found.\n"))
+        print(_("Tələbə tapılmadı.", "Student not found."))
 
 def update_record():
-    name = input(_("Yenilənəcək tələbənin adı: ", "Enter student name to update: "))
+    name = input(_("Yeniləmək istədiyiniz ad: ", "Enter student name to update: "))
     for student in gradebook:
         if student['name'].lower() == name.lower():
-            print(f"{_('Cari qiymətlər:', 'Current grades:')} {student['grades']}")
+            print(_("Cari qiymətlər: ", "Current grades: "), student['grades'])
             new_grades = []
             while True:
-                grade = input(_("Yeni qiymət (çıxmaq üçün q): ", "Enter new grade (or 'q' to quit): "))
+                grade = input(_("Yeni qiymət (bitirmək üçün q): ", "New grade (or 'q' to quit): "))
                 if grade.lower() == 'q':
                     break
                 try:
                     new_grades.append(float(grade))
-                except ValueError:
-                    print(_("Yanlış qiymət!", "Invalid grade!"))
+                except:
+                    print(_("Yanlış format!", "Invalid format!"))
             student['grades'] = new_grades
             save_to_file()
-            print(_("✅ Yeniləndi.\n", "✅ Grades updated.\n"))
+            print(_("Yeniləndi.", "Updated."))
             return
-    print(_("❌ Tələbə tapılmadı.\n", "❌ Student not found.\n"))
+    print(_("Tələbə tapılmadı.", "Student not found."))
 
 def delete_record():
-    name = input(_("Silinəcək ad: ", "Enter student name to delete: "))
+    name = input(_("Silinəcək ad: ", "Enter name to delete: "))
     for i, student in enumerate(gradebook):
         if student['name'].lower() == name.lower():
             gradebook.pop(i)
             save_to_file()
-            print(_("🗑 Tələbə silindi.\n", "🗑 Student deleted.\n"))
+            print(_("Silindi.", "Deleted."))
             return
-    print(_("❌ Tələbə tapılmadı.\n", "❌ Student not found.\n"))
+    print(_("Tapılmadı.", "Not found."))
 
 def summary_stats():
     if not gradebook:
-        print(_("🚫 Heç bir qeyd yoxdur.\n", "🚫 No records available.\n"))
+        print(_("Qeyd yoxdur.", "No data available."))
         return
     for student in gradebook:
-        if student['grades']:
-            avg = sum(student['grades']) / len(student['grades'])
-            print(f"{student['name']} - {_('Orta:', 'Average:')} {avg:.2f}")
+        grades = student['grades']
+        if grades:
+            avg = sum(grades) / len(grades)
+            print(f"{student['name']} - {_( 'Orta:', 'Average:')} {avg:.2f}")
         else:
-            print(f"{student['name']} {_('qiyməti yoxdur.', 'has no grades.')}")
-    print()
+            print(f"{student['name']} - {_('Qiymət yoxdur.', 'No grades.')}")
 
 def recursive_count(index=0):
     if index >= len(gradebook):
@@ -155,37 +159,38 @@ def recursive_count(index=0):
     return 1 + recursive_count(index + 1)
 
 def help_menu():
-    print(_("""📖 Təlimat:
-- Tələbələri və onların qiymətlərini əlavə et
-- Axtar, sil, yenilə və bax
-- Fayla saxla və fayldan yüklə
-- Orta qiymətləri göstər
+    print(_("""
+İstifadəçi təlimatı:
+- Tələbə əlavə edin və qiymətlər daxil edin
+- Axtarın, yeniləyin və silin
+- Statistik məlumatlara baxın
+- Fayla yazın və oxuyun
 """, """
-📖 Instructions:
-- Add students and their grades
-- View, search, update or delete records
-- Save/load from file
-- See average statistics
+Instructions:
+- Add students and enter grades
+- Search, update and delete entries
+- View statistics
+- Save/load data from file
 """))
 
 def clear_all_data():
-    confirm = input(_("Bütün məlumatı silmək istədiyinizə əminsiniz? (bəli/xeyr): ", "Are you sure you want to clear all data? (yes/no): "))
+    confirm = input(_("Bütün məlumatı silmək istəyirsiniz? (bəli/xeyr): ", "Clear all data? (yes/no): "))
     if confirm.lower() in ["bəli", "yes"]:
         gradebook.clear()
         save_to_file()
-        print(_("🧹 Bütün məlumat silindi.\n", "🧹 All data cleared.\n"))
+        print(_("Məlumat silindi.", "Data cleared."))
     else:
-        print(_("❌ Ləğv edildi.\n", "❌ Cancelled.\n"))
+        print(_("Əməliyyat ləğv edildi.", "Cancelled."))
 
 
 def main():
-    authenticate()
     choose_language()
+    verify_human()
     load_from_file()
 
     while True:
         main_menu()
-        choice = input(_("Seçiminizi daxil edin: ", "Enter your choice: "))
+        choice = input(_("Seçim: ", "Choice: "))
         match choice:
             case "1": add_record()
             case "2": view_records()
@@ -195,14 +200,14 @@ def main():
             case "6": summary_stats()
             case "7": save_to_file()
             case "8": load_from_file()
-            case "9": print(f"{_('Ümumi qeyd sayı:', 'Total records:')} {recursive_count()}\n")
+            case "9": print(f"{_('Qeyd sayı:', 'Total records:')} {recursive_count()}")
             case "10": help_menu()
             case "11": clear_all_data()
             case "0":
                 save_to_file()
-                print(_("📤 Çıxılır... Hələlik!", "📤 Exiting... Goodbye!"))
+                print(_("Proqram bağlanır...", "Exiting..."))
                 break
-            case _: print(_("❌ Yanlış seçim.\n", "❌ Invalid option.\n"))
+            case _: print(_("Yanlış seçim.", "Invalid choice."))
 
 if __name__ == "__main__":
     main()
